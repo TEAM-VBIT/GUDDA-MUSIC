@@ -38,7 +38,7 @@
 
 <br/>
 
-[![Deploy On Heroku](https://img.shields.io/badge/━━━━━━%20🚀%20DEPLOY%20ON%20HEROKU%20━━━━━━-430098?style=for-the-badge&logo=heroku&logoColor=white)](https://dashboard.heroku.com/new?template=https://github.com/bot048911-svg/VAMPIRE-MUSIC)
+[![Deploy On Heroku](https://img.shields.io/badge/━━━━━━%20🚀%20DEPLOY%20ON%20HEROKU%20━━━━━━-430098?style=for-the-badge&logo=heroku&logoColor=white)](https://dashboard.heroku.com/new?template=https://github.com/TEAM-VBIT/GUDDA-MUSIC)
 
 <br/>
 
@@ -49,7 +49,7 @@
 ### 🖥️ &nbsp; Local / VPS Deployment
 
 <div align="center">
-- Required variables mentioned in <a href="https://github.com/bot048911-svg/VAMPIRE-MUSIC/blob/master/sample.env">sample.env</a>
+- Required variables mentioned in <a href="https://github.com/TEAM-VBIT/GUDDA-MUSIC/blob/main/sample.env">sample.env</a>
 
 1. **Upgrade & Update:**
    ```bash
@@ -72,7 +72,7 @@
    ```
 4. **Clone the Repository**
    ```bash
-   git clone https://github.com/bot048911-svg/VAMPIRE-MUSIC && cd VAMPIRE-MUSIC
+   git clone https://github.com/TEAM-VBIT/GUDDA-MUSIC && cd GUDDA-MUSIC
    ```
 5. **Install Requirements**
    ```bash
