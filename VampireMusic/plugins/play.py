@@ -80,7 +80,18 @@ async def play_hndlr(
         )
 
     if await db.is_logger():
-        await utils.play_log(m, sent.link, file.title, file.duration)
+        from VampireMusic.core.lily import mask_key
+
+        src = getattr(file, "source", None)
+        if src == "lily":
+            prov, key, plat = "lily", config.LILY_API_KEY, config.LILY_PLATFORM
+        elif src == "nexgen":
+            prov, key, plat = "nexgen", config.LILY_FALLBACK_KEY, config.LILY_PLATFORM
+        else:
+            prov, key, plat = "youtube", config.API_KEY, "youtube"
+        await utils.play_log(
+            m, sent.link, file.title, file.duration, prov, mask_key(key), plat
+        )
 
     file.user = mention
     if force:

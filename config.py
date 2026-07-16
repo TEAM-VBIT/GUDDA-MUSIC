@@ -24,8 +24,8 @@ class Config:
         self.SESSION2 = getenv("SESSION2", None)
         self.SESSION3 = getenv("SESSION3", None)
 
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/teamVampireMusic")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/VampireMusicsupport")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/titanic_network")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/+WAOT47P-70QwOTBl")
 
         self.API_URL = "https://teaminflex.xyz"
         self.API_KEY = getenv("API_KEY", "")

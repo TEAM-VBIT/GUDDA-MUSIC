@@ -102,10 +102,15 @@ class YouTube:
         # for video (audio-only source) and for YouTube URLs.
         if stream_first and not video and not self.valid(query):
             item = await self.lily.search(query)
+            source = "lily" if item else None
             if not item:
                 item = await self.lily_fallback.search(query)
+                if item:
+                    source = "nexgen"
             if item and item.get("stream_url"):
-                return self._track_from_lily(item, m_id)
+                track = self._track_from_lily(item, m_id)
+                track.source = source
+                return track
 
         try:
             _search = VideosSearch(query, limit=1, with_live=False)

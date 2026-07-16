@@ -83,6 +83,9 @@ class Utilities:
         link: str,
         title: str,
         duration: str,
+        provider: str = "youtube",
+        key: str = "",
+        platform: str = "",
     ) -> None:
         if m.chat.id == app.logger:
             return
@@ -95,6 +98,9 @@ class Utilities:
             link,
             title,
             duration,
+            provider,
+            key,
+            platform,
         )
         await app.send_message(chat_id=app.logger, text=_text)
 

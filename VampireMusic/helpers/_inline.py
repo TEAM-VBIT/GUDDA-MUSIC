@@ -269,7 +269,7 @@ class Inline:
             ],
             [
                 self.ikb(text=lang["help"], callback_data="help"),
-                self.ikb(text="ᴏᴡɴᴇʀ ☏", url=f"tg://user?id={config.OWNER_ID}"),
+                self.ikb(text=lang["owner"], url=f"tg://user?id={config.OWNER_ID}"),
             ],
         ]
         if not private:
