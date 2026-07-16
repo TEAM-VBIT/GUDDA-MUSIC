@@ -1,1 +1,12 @@
-python3 -m uv run --no-sync python3 -m VampireMusic
+#!/usr/bin/env bash
+set -e
+
+# `uv` is a STANDALONE BINARY, not a Python module — so it must be invoked as
+# `uv`, NOT `python3 -m uv` (that raises "No module named uv" and crashes).
+if ! command -v uv >/dev/null 2>&1; then
+  echo "[start] uv not found on PATH — installing..."
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
+exec uv run --no-sync python3 -m VampireMusic
