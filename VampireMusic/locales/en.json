@@ -166,8 +166,6 @@
     "skipped": " ❖ sᴛʀᴇᴀᴍ sᴋɪᴘᴘᴇᴅ",
     "stopped": " ❖ Sᴛʀᴇᴀᴍ ᴇɴᴅᴇᴅ",
     "owner": "ᴏᴡɴᴇʀ ✆",
-    "owner_missing": "Owner not configured. Set OWNER_ID in .env",
-    "owner_info": "<b>ᴏᴡɴᴇʀ:</b> {0}\n<b>ID:</b> <code>{1}</code>",
     "source": "Source",
     "support": "sᴜᴘᴘᴏʀᴛ ⍝",
     "help_0": "ᴀᴅᴍɪɴs",

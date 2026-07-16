@@ -269,7 +269,7 @@ class Inline:
             ],
             [
                 self.ikb(text=lang["help"], callback_data="help"),
-                self.ikb(text=lang["owner"], callback_data="owner"),
+                self.ikb(text=lang["owner"], url=config.OWNER_LINK),
             ],
         ]
         if not private:
