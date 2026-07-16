@@ -193,9 +193,9 @@ async def _help(_, query: types.CallbackQuery):
     elif data[1] == "home":
         private = query.message.chat.type == enums.ChatType.PRIVATE
         _text = (
-            query.lang["start_pm"].format(query.from_user.first_name, app.name)
+            query.lang["start_pm"].format(query.from_user.first_name, app.mention)
             if private
-            else query.lang["start_gp"].format(app.name)
+            else query.lang["start_gp"].format(app.mention)
         )
         _key = buttons.start_key(query.lang, private)
     elif data[1] == "back":
