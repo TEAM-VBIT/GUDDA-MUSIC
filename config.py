@@ -15,7 +15,7 @@ class Config:
 
         self.LOGGER_ID = int(getenv("LOGGER_ID", 0))
         self.OWNER_ID = int(getenv("OWNER_ID", 0))
-        self.OWNER_USERNAME = getenv("OWNER_USERNAME", "Ankit_sharma_212")
+        self.OWNER_USERNAME = getenv("OWNER_USERNAME", "lVAMPIRE_KINGl")
         self.OWNER_LINK = f"https://t.me/{self.OWNER_USERNAME.lstrip('@')}"
 
         self.DURATION_LIMIT = int(getenv("DURATION_LIMIT", 14400)) * 14400
@@ -26,8 +26,8 @@ class Config:
         self.SESSION2 = getenv("SESSION2", None)
         self.SESSION3 = getenv("SESSION3", None)
 
-        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/titanic_network")
-        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/+WAOT47P-70QwOTBl")
+        self.SUPPORT_CHANNEL = getenv("SUPPORT_CHANNEL", "https://t.me/llDARK_WORLDll")
+        self.SUPPORT_CHAT = getenv("SUPPORT_CHAT", "https://t.me/VAMPIRESUPPORTT")
 
         self.API_URL = "https://teaminflex.xyz"
         self.API_KEY = getenv("API_KEY", "")
