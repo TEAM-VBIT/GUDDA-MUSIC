@@ -82,69 +82,73 @@ class Thumbnail:
                 f.write(await resp.read())
 
     def create_image(self, thumb_path, output, song):
-        # Background (blurred + darkened)
+        # Full-bleed blurred warm background
         bg = Image.open(thumb_path).convert("RGB").resize((self.WIDTH, self.HEIGHT))
-        bg = bg.filter(ImageFilter.GaussianBlur(55))
-        bg = ImageEnhance.Brightness(bg).enhance(0.30)
-        bg = ImageEnhance.Contrast(bg).enhance(1.15)
+        bg = bg.filter(ImageFilter.GaussianBlur(45))
+        bg = ImageEnhance.Brightness(bg).enhance(0.92)
+        bg = ImageEnhance.Contrast(bg).enhance(1.05)
         bg = ImageEnhance.Color(bg).enhance(1.10)
 
-        # Top-down dark gradient for text legibility
-        grad = Image.new("L", (self.WIDTH, self.HEIGHT), 0)
-        gdraw = ImageDraw.Draw(grad)
-        for y in range(self.HEIGHT):
-            gdraw.line([(0, y), (self.WIDTH, y)], fill=int(150 * (y / self.HEIGHT)))
-        shadow = Image.new("RGB", (self.WIDTH, self.HEIGHT), (0, 0, 0))
-        bg = Image.composite(shadow, bg, grad)
+        # Right-side dark panel: gradient from left (transparent) to right (opaque)
+        panel = Image.new("L", (self.WIDTH, self.HEIGHT), 0)
+        pdraw = ImageDraw.Draw(panel)
+        pw0, pw1 = int(self.WIDTH * 0.42), self.WIDTH
+        for x in range(pw0, pw1):
+            a = int(235 * (x - pw0) / (pw1 - pw0))
+            pdraw.line([(x, 0), (x, self.HEIGHT)], fill=a)
+        dark = Image.new("RGB", (self.WIDTH, self.HEIGHT), (8, 6, 8))
+        bg = Image.composite(dark, bg, panel)
+        # Subtle overall vignette
+        vig = Image.new("L", (self.WIDTH, self.HEIGHT), 0)
+        vdraw = ImageDraw.Draw(vig)
+        vdraw.rectangle([0, 0, self.WIDTH, self.HEIGHT], fill=60)
+        vdraw.ellipse([-200, -200, self.WIDTH + 200, self.HEIGHT + 200], fill=0)
+        bg = Image.composite(bg, Image.new("RGB", (self.WIDTH, self.HEIGHT), (0, 0, 0)), vig)
 
-        # Glass container
-        container_w, container_h = 1140, 420
-        cx = (self.WIDTH - container_w) // 2
-        cy = (self.HEIGHT - container_h) // 2
-        container = Image.new("RGBA", (container_w, container_h), (20, 20, 30, 90))
-        cdraw = ImageDraw.Draw(container)
-        cdraw.rounded_rectangle(
-            (0, 0, container_w, container_h), radius=45,
-            outline=(255, 255, 255, 70), width=3,
-        )
-        bg.paste(container, (cx, cy), container)
+        ACCENT = (197, 48, 48)  # reference red ~ rgb(163,52,49)
 
-        # Album art (rounded)
-        cover = 300
-        ax, ay = cx + 60, cy + 60
+        # Big rounded album cover on the left
+        cover = 440
+        ax, ay = 90, (self.HEIGHT - cover) // 2 - 10
         art = Image.open(thumb_path).convert("RGB").resize((cover, cover))
+        # soft shadow under the cover
+        sh = Image.new("RGBA", (cover + 40, cover + 40), (0, 0, 0, 0))
+        sdraw = ImageDraw.Draw(sh)
+        sdraw.rounded_rectangle((20, 24, cover + 20, cover + 24), radius=40, fill=(0, 0, 0, 120))
+        bg.paste(sh, (ax - 20, ay - 20), sh)
         mask = Image.new("L", (cover, cover), 0)
-        ImageDraw.Draw(mask).rounded_rectangle((0, 0, cover, cover), radius=32, fill=255)
+        ImageDraw.Draw(mask).rounded_rectangle((0, 0, cover, cover), radius=40, fill=255)
         art.putalpha(mask)
         bg.paste(art, (ax, ay), art)
 
-        # "NOW PLAYING" pill
-        pill_font = _font("Raleway-Bold.ttf", 22)
+        # "NOW PLAYING" pill above the cover
+        pill_font = _font("Raleway-Bold.ttf", 24)
         pill = "▶ NOW PLAYING"
         pb = draw_text_bbox(pill_font, pill)
-        pw, ph = pb[2] - pb[0] + 36, pb[3] - pb[1] + 22
-        px, py = ax, ay - 46
-        pimg = Image.new("RGBA", (pw, ph), (255, 60, 90, 220))
-        pdraw = ImageDraw.Draw(pimg)
-        pdraw.rounded_rectangle((0, 0, pw, ph), radius=ph // 2, outline=(255, 255, 255, 80), width=2)
+        pw, ph = pb[2] - pb[0] + 44, pb[3] - pb[1] + 24
+        px, py = ax, ay - 56
+        pimg = Image.new("RGBA", (pw, ph), ACCENT + (235,))
+        pdraw2 = ImageDraw.Draw(pimg)
+        pdraw2.rounded_rectangle((0, 0, pw, ph), radius=ph // 2, outline=(255, 255, 255, 90), width=2)
         bg.paste(pimg, (px, py), pimg)
         ImageDraw.Draw(bg).text(
-            (px + 18, py + (ph - (pb[3] - pb[1])) // 2 - 2), pill,
-            fill="white", font=pill_font,
+            (px + 22, py + (ph - (pb[3] - pb[1])) // 2 - 2), pill, fill="white", font=pill_font,
         )
 
         draw = ImageDraw.Draw(bg)
-        tx = ax + cover + 55
-        ty = cy + 95
+        # Text column on the right of the cover, over the dark panel
+        tx = ax + cover + 70
+        max_w = self.WIDTH - tx - 80
+        ty = ay + 40
 
-        title = wrap_text((song.title or "Unknown"), self.title_font, container_w - (tx - cx) - 70, 2)
-        draw.multiline_text((tx, ty), title, fill="white", font=self.title_font, spacing=8)
+        title = wrap_text((song.title or "Unknown"), self.title_font, max_w, 3)
+        draw.multiline_text((tx, ty), title, fill=(252, 248, 244), font=self.title_font, spacing=10)
 
-        cy1 = ty + 2 * 60 + 16
+        ay1 = ty + 3 * 58
         channel = (song.channel_name or "Unknown")
-        if len(channel) > 34:
-            channel = channel[:33] + "…"
-        draw.text((tx, cy1), channel, fill=(200, 210, 230), font=self.small_font)
+        if len(channel) > 38:
+            channel = channel[:37] + "…"
+        draw.text((tx, ay1), channel, fill=(222, 120, 124), font=self.small_font)
 
         meta = []
         if getattr(song, "view_count", None):
@@ -152,33 +156,35 @@ class Thumbnail:
         if getattr(song, "duration", None):
             meta.append(f"⏱ {song.duration}")
         if meta:
-            draw.text((tx, cy1 + 40), "  •  ".join(meta), fill=(170, 180, 200), font=self.small_font)
+            draw.text((tx, ay1 + 42), "   •   ".join(meta), fill=(205, 195, 195), font=self.small_font)
 
-        # Brand badge
+        # Brand badge (bottom-right)
         brand_font = _font("Raleway-Bold.ttf", 26)
         brand = "Vampire Music"
         bb = draw_text_bbox(brand_font, brand)
         bw, bh = (bb[2] - bb[0]) + 40, (bb[3] - bb[1]) + 30
-        bx, by = cx + container_w - bw - 55, cy + container_h - bh - 55
-        badge = Image.new("RGBA", (bw, bh), (0, 0, 0, 180))
+        bx, by = self.WIDTH - bw - 70, self.HEIGHT - bh - 60
+        badge = Image.new("RGBA", (bw, bh), (0, 0, 0, 170))
         bdraw = ImageDraw.Draw(badge)
         bdraw.rounded_rectangle((0, 0, bw, bh), radius=15, outline=(255, 255, 255, 50), width=2)
         bg.paste(badge, (bx, by), badge)
         draw.text((bx + 20, by + (bh - (bb[3] - bb[1])) // 2 - 5), brand, fill="white", font=brand_font)
 
-        # Labeled progress bar
-        py2 = cy + container_h - 70
-        sx, ex = cx + 60, cx + container_w - 60
-        draw.line([(sx, py2), (ex, py2)], fill=(200, 200, 200, 150), width=8)
+        # Labeled progress bar (bottom, spans the dark panel)
+        py2 = self.HEIGHT - 70
+        sx, ex = tx - 30, self.WIDTH - 70
+        draw.line([(sx, py2), (ex, py2)], fill=(120, 120, 120, 160), width=8)
         frac = min(max(getattr(song, "time", 0) / max(getattr(song, "duration_sec", 1) or 1, 1), 0), 1)
         knx = sx + int((ex - sx) * frac)
-        draw.ellipse((knx - 12, py2 - 12, knx + 12, py2 + 12), fill="white")
+        draw.line([(sx, py2), (knx, py2)], fill=ACCENT, width=8)
+        draw.ellipse((knx - 13, py2 - 13, knx + 13, py2 + 13), fill="white")
+        draw.ellipse((knx - 7, py2 - 7, knx + 7, py2 + 7), fill=ACCENT)
         tfont = _font("Raleway-Bold.ttf", 22)
         cur = _fmt(getattr(song, "time", 0))
         tot = _fmt(getattr(song, "duration_sec", 0))
-        draw.text((sx, py2 + 18), cur, fill=(210, 210, 210), font=tfont)
+        draw.text((sx, py2 + 20), cur, fill=(225, 220, 220), font=tfont)
         tb = draw_text_bbox(tfont, tot)
-        draw.text((ex - (tb[2] - tb[0]), py2 + 18), tot, fill=(210, 210, 210), font=tfont)
+        draw.text((ex - (tb[2] - tb[0]), py2 + 20), tot, fill=(225, 220, 220), font=tfont)
 
         bg.save(output, quality=95)
         return output
