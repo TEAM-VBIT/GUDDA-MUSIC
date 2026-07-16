@@ -9,7 +9,7 @@ from py_yt import Playlist, VideosSearch
 
 from VampireMusic import app, config, logger
 from VampireMusic.core._fallen_api import FallenApi
-from VampireMusic.core.lily import LilyApi
+from VampireMusic.core.lily import LilyApi, mask_key
 from VampireMusic.helpers import Track, utils
 
 
@@ -178,7 +178,10 @@ class YouTube:
         return tracks
 
     async def _download_audio(self, video_id: str):
-        logger.info(f"🎵 [AUDIO] Starting download process for ID: {video_id}")
+        logger.info(
+            f"🎵 [AUDIO] Starting download for ID {video_id} via "
+            f"{config.API_URL} key={mask_key(config.API_KEY)}"
+        )
 
         path = Path(f"downloads/{video_id}.webm")
         os.makedirs("downloads", exist_ok=True)
@@ -264,7 +267,10 @@ class YouTube:
                 return None
 
     async def _download_video(self, video_id: str):
-        logger.info(f"🎥 [VIDEO] Starting download process for ID: {video_id}")
+        logger.info(
+            f"🎥 [VIDEO] Starting download for ID {video_id} via "
+            f"{config.API_URL} key={mask_key(config.API_KEY)}"
+        )
 
         path = Path(f"downloads/{video_id}.mkv")
         os.makedirs("downloads", exist_ok=True)

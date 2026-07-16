@@ -6,6 +6,15 @@ import aiohttp
 from VampireMusic import logger
 
 
+def mask_key(key: str | None) -> str:
+    """Mask a secret API key for safe logging (first 6 + last 4 chars)."""
+    if not key:
+        return "<unset>"
+    if len(key) <= 10:
+        return key[:2] + "***"
+    return f"{key[:6]}…{key[-4:]}"
+
+
 class LilyApi:
     """Client for the lily-style ``/search/all`` music API.
 
@@ -83,7 +92,16 @@ class LilyApi:
                     and isinstance(data, dict)
                     and data.get("success")
                 ):
-                    return self._first_playable(data)
+                    item = self._first_playable(data)
+                    if item is not None:
+                        logger.info(
+                            f"[{self.name}] PLAY resolved via provider="
+                            f"{self.name} url={self.base} "
+                            f"platform={','.join(self.platforms)} "
+                            f"key={mask_key(self.api_key)} query={query!r} "
+                            f"-> title={item.get('title')!r}"
+                        )
+                    return item
                 logger.warning(
                     f"[{self.name}] search({query!r}) HTTP {resp.status} -> "
                     f"{data if isinstance(data, dict) else 'invalid response'}"
