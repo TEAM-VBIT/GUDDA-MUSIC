@@ -79,7 +79,7 @@ class Thumbnail:
 
     def create_image(self, thumb_path, output, song):
         # Dynamic font loading for proper sizes
-        font_title = safe_font(FONT_TITLE_PATH, 34)
+        font_title = safe_font(FONT_TITLE_PATH, 46)
         font_info = safe_font(FONT_INFO_PATH, 24)
         font_time = safe_font(FONT_INFO_PATH, 20)
         font_brand = safe_font(FONT_TITLE_PATH, 26)
@@ -178,7 +178,9 @@ class Thumbnail:
             return best
 
         title_str = ellipsize(title_text, font_title, 820)
-        title_y = 385
+        title_y = 378
+        # subtle shadow for a bolder, more prominent title
+        card_draw.text((42, title_y + 2), title_str, fill=(0, 0, 0, 40), font=font_title)
         card_draw.text((40, title_y), title_str, fill=(20, 20, 20, 255), font=font_title)
 
         # Subtitle (Channel name & views)
