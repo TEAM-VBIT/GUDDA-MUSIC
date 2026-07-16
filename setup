@@ -86,7 +86,7 @@ install_uv() {
 
 install_py() {
     pprint "\n\nInstalling Python dependencies...\n"
-    if python3 -m uv sync --frozen -q; then
+    if uv sync --frozen -q; then
         pprint "Done.\n" "cgreen"
     else
         pprint "Failed (continuing...)\n" "cred"
